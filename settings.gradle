@@ -1,0 +1,5 @@
+include('streaming-lib')
+include("streaming-producer")
+include("streaming-consumer")
+include("streaming-processor1")
+include("streaming-processor2")

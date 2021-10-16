@@ -1,0 +1,9 @@
+server:
+  port: 5000
+management:
+  server:
+    port: 5001
+  endpoint:
+    health:
+      probes:
+        enabled: true

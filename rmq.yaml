@@ -1,0 +1,9 @@
+apiVersion: rabbitmq.com/v1beta1
+kind: RabbitmqCluster
+metadata:
+  name: cluster1
+spec:
+  rabbitmq:
+    additionalPlugins:
+      - rabbitmq_top
+      - rabbitmq_shovel

@@ -1,0 +1,67 @@
+releases:
+  - name: streaming-producer
+    chart: helm/streaming-service
+    values:
+      - image:
+          repository: localhost/streaming-producer
+          tag: 0.0.6
+        appConfig:
+          spring:
+            rabbitmq:
+              host: cluster1
+              username: default_user_MMPMaInRnalJfVI0CLW
+              password: 59851ZcAEabItp31aS8fbYiOcu_eyAKm
+
+  - name: streaming-consumer
+    chart: helm/streaming-service
+    values:
+      - image:
+          repository: localhost/streaming-consumer
+          tag: 0.0.6
+        appConfig:
+          spring:
+            rabbitmq:
+              host: cluster1
+              username: default_user_MMPMaInRnalJfVI0CLW
+              password: 59851ZcAEabItp31aS8fbYiOcu_eyAKm
+
+  - name: streaming-processor1
+    chart: helm/streaming-service
+    values:
+      - image:
+          repository: localhost/streaming-processor1
+          tag: 0.0.6
+        appConfig:
+          spring:
+            rabbitmq:
+              host: cluster1
+              username: default_user_MMPMaInRnalJfVI0CLW
+              password: 59851ZcAEabItp31aS8fbYiOcu_eyAKm
+            cloud:
+              stream:
+                bindings:
+                  peopleProcessor1-in-0:
+                    destination: peopleProducer-out-0
+                  peopleProcessor1-out-0:
+                    destination: peopleConsumer-in-0
+
+
+  - name: streaming-processor2
+    chart: helm/streaming-service
+    values:
+      - image:
+          repository: localhost/streaming-processor2
+          tag: 0.0.6
+        appConfig:
+          spring:
+            rabbitmq:
+              host: cluster1
+              username: default_user_MMPMaInRnalJfVI0CLW
+              password: 59851ZcAEabItp31aS8fbYiOcu_eyAKm
+            cloud:
+              stream:
+                bindings:
+                  peopleProcessor2-in-0:
+                    destination: peopleProducer-out-0
+                  peopleProcessor2-out-0:
+                    destination: peopleConsumer-in-0

@@ -1,0 +1,78 @@
+apiVersion: skaffold/v2beta24
+kind: Config
+build:
+  local:
+    push: false
+  tagPolicy:
+    sha256: { }
+
+  artifacts:
+    - image: streaming-producer
+      context: streaming-producer
+      jib:
+        project: streaming-producer
+    - image: streaming-consumer
+      context: streaming-consumer
+      jib:
+        project: streaming-consumer
+    - image: streaming-processor1
+      context: streaming-processor1
+      jib:
+        project: streaming-processor1
+    - image: streaming-processor2
+      context: streaming-processor2
+      jib:
+        project: streaming-processor2
+deploy:
+  helm:
+    releases:
+      - name: streaming-producer
+        chartPath: helm/streaming-service
+        artifactOverrides:
+          image: streaming-producer
+        imageStrategy:
+          helm: {}
+        valuesFiles:
+          - .skaffold/streaming-producer.yaml
+      - name: streaming-consumer
+        chartPath: helm/streaming-service
+        artifactOverrides:
+          image: streaming-consumer
+        imageStrategy:
+          helm: {}
+        valuesFiles:
+          - .skaffold/streaming-consumer.yaml
+      - name: streaming-processor1
+        chartPath: helm/streaming-service
+        artifactOverrides:
+          image: streaming-processor1
+        imageStrategy:
+          helm: {}
+        valuesFiles:
+          - .skaffold/streaming-processor1.yaml
+      - name: streaming-processor2
+        chartPath: helm/streaming-service
+        artifactOverrides:
+          image: streaming-processor2
+        imageStrategy:
+          helm: {}
+        valuesFiles:
+          - .skaffold/streaming-processor2.yaml
+    hooks:
+      before:
+        - host:
+            command:
+              - env
+              - sh
+              - -c
+              - |-
+                helmfile --selector name=streaming-producer write-values --skip-deps --output-file-template=.skaffold/streaming-producer.yaml
+                helmfile --selector name=streaming-consumer write-values --skip-deps --output-file-template=.skaffold/streaming-consumer.yaml
+                helmfile --selector name=streaming-processor1 write-values --skip-deps --output-file-template=.skaffold/streaming-processor1.yaml
+                helmfile --selector name=streaming-processor2 write-values --skip-deps --output-file-template=.skaffold/streaming-processor2.yaml
+      after:
+        - host:
+            command:
+              - rm
+              - -rf
+              - .skaffold
