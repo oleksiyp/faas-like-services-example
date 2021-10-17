@@ -1,0 +1,8 @@
+apiVersion: rabbitmq.com/v1beta1
+kind: RabbitmqCluster
+metadata:
+  name: {{ include "rabbitmq-cluster.fullname" . }}
+  labels:
+  {{- include "rabbitmq-cluster.labels" . | nindent 4 }}
+spec:
+  {{ .Values.config | toYaml | nindent 2 }}

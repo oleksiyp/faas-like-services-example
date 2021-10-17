@@ -1,18 +1,55 @@
+repositories:
+  - name: kedacore
+    url: https://kedacore.github.io/charts
+  - name: wavefront
+    url: https://wavefronthq.github.io/helm/
+  - name: bitnami
+    url: https://charts.bitnami.com/bitnami
+
 releases:
+  - name: rabbitmq-operator
+    chart: bitnami/rabbitmq-cluster-operator
+
+  - name: rabbitmq-cluster
+    needs:
+      - rabbitmq-operator
+    chart: helm/rabbitmq-cluster
+    values:
+      - config:
+          rabbitmq:
+            additionalPlugins:
+              - rabbitmq_top
+
+  - name: keda
+    chart: kedacore/keda
+
+  - name: wavefront
+    chart: wavefront/wavefront
+    installed: {{ gt (env "WAVEFRONT_TOKEN" | default "" | len) 0 }}
+    values:
+      - wavefront:
+          url: https://longboard.wavefront.com
+          token: {{ requiredEnv "WAVEFRONT_TOKEN" }}
+        clusterName: streaming-example
+
   - name: streaming-producer
     chart: helm/streaming-service
+    needs:
+      - keda
+      - rabbitmq-cluster
+      - wavefront
     values:
+      - values-rmq-secret.yaml.gotmpl
       - image:
-          repository: localhost/streaming-producer
-          tag: 0.0.6
+          repository: streaming-producer
+          tag: 1.0.0
+        replicaCount: 1
         appConfig:
           spring:
             application:
               name: streaming-producer
             rabbitmq:
-              host: cluster1
-              username: default_user_MMPMaInRnalJfVI0CLW
-              password: 59851ZcAEabItp31aS8fbYiOcu_eyAKm
+              host: rabbitmq-cluster
           wavefront:
             application:
               name: streaming-example
@@ -20,23 +57,26 @@ releases:
             metrics:
               export:
                 wavefront:
-                  api-token: {{ requiredEnv "WAVEFRONT_TOKEN" }}
+                  api-token: {{ env "WAVEFRONT_TOKEN" | default "not-set" }}
                   uri: https://longboard.wavefront.com
 
   - name: streaming-consumer
     chart: helm/streaming-service
+    needs:
+      - keda
+      - rabbitmq-cluster
+      - wavefront
     values:
+      - values-rmq-secret.yaml.gotmpl
       - image:
-          repository: localhost/streaming-consumer
-          tag: 0.0.6
+          repository: streaming-consumer
+          tag: 1.0.0
         appConfig:
           spring:
             application:
               name: streaming-consumer
             rabbitmq:
-              host: cluster1
-              username: default_user_MMPMaInRnalJfVI0CLW
-              password: 59851ZcAEabItp31aS8fbYiOcu_eyAKm
+              host: rabbitmq-cluster
           wavefront:
             application:
               name: streaming-example
@@ -44,23 +84,27 @@ releases:
             metrics:
               export:
                 wavefront:
-                  api-token: {{ requiredEnv "WAVEFRONT_TOKEN" }}
+                  api-token: {{ env "WAVEFRONT_TOKEN" | default "not-set" }}
                   uri: https://longboard.wavefront.com
 
   - name: streaming-processor1
     chart: helm/streaming-service
+    needs:
+      - keda
+      - rabbitmq-cluster
+      - wavefront
     values:
+      - values-rmq-secret.yaml.gotmpl
+      - values-scaling.yaml.gotmpl
       - image:
-          repository: localhost/streaming-processor1
-          tag: 0.0.6
+          repository: streaming-processor1
+          tag: 1.0.0
         appConfig:
           spring:
             application:
               name: streaming-processor1
             rabbitmq:
-              host: cluster1
-              username: default_user_MMPMaInRnalJfVI0CLW
-              password: 59851ZcAEabItp31aS8fbYiOcu_eyAKm
+              host: rabbitmq-cluster
             cloud:
               stream:
                 bindings:
@@ -76,28 +120,31 @@ releases:
             metrics:
               export:
                 wavefront:
-                  api-token: {{ requiredEnv "WAVEFRONT_TOKEN" }}
+                  api-token: {{ env "WAVEFRONT_TOKEN" | default "not-set" }}
                   uri: https://longboard.wavefront.com
         scaling:
           rabbitMQ:
             enabled: true
-            apiUrl: "http://default_user_MMPMaInRnalJfVI0CLW:59851ZcAEabItp31aS8fbYiOcu_eyAKm@cluster1.default:15672/"
             queueName: "peopleProducer-out-0.processor1"
 
   - name: streaming-processor2
     chart: helm/streaming-service
+    needs:
+      - keda
+      - rabbitmq-cluster
+      - wavefront
     values:
+      - values-rmq-secret.yaml.gotmpl
+      - values-scaling.yaml.gotmpl
       - image:
-          repository: localhost/streaming-processor2
-          tag: 0.0.6
+          repository: streaming-processor2
+          tag: 1.0.0
         appConfig:
           spring:
             application:
               name: streaming-processor2
             rabbitmq:
-              host: cluster1
-              username: default_user_MMPMaInRnalJfVI0CLW
-              password: 59851ZcAEabItp31aS8fbYiOcu_eyAKm
+              host: rabbitmq-cluster
             cloud:
               stream:
                 bindings:
@@ -113,10 +160,9 @@ releases:
             metrics:
               export:
                 wavefront:
-                  api-token: {{ requiredEnv "WAVEFRONT_TOKEN" }}
+                  api-token: {{ env "WAVEFRONT_TOKEN" | default "not-set" }}
                   uri: https://longboard.wavefront.com
         scaling:
           rabbitMQ:
             enabled: true
-            apiUrl: "http://default_user_MMPMaInRnalJfVI0CLW:59851ZcAEabItp31aS8fbYiOcu_eyAKm@cluster1.default:15672/"
             queueName: "peopleProducer-out-0.processor2"

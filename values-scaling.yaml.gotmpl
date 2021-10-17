@@ -1,0 +1,3 @@
+scaling:
+  rabbitMQ:
+    apiUrl: "http://{{ exec "kubectl" (list "get" "secrets" "rabbitmq-cluster-default-user" "-o" "jsonpath={.data.username}") | b64dec }}:{{ exec "kubectl" (list "get" "secrets" "rabbitmq-cluster-default-user" "-o" "jsonpath={.data.password}") | b64dec }}@rabbitmq-cluster.default:15672/"
