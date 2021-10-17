@@ -1,4 +1,4 @@
-package lib;
+package app;
 
 import lombok.Builder;
 import lombok.Value;
