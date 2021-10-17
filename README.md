@@ -2,7 +2,9 @@
 
 ## Article
 
+Accompanying article:
 
+https://medium.com/@oleksiypylypenko/faas-like-spring-microservices-with-autoscaling-in-kubernetes-1dcd21c5d06f
 
 ## How to run?
 
