@@ -7,10 +7,21 @@ releases:
           tag: 0.0.6
         appConfig:
           spring:
+            application:
+              name: streaming-producer
             rabbitmq:
               host: cluster1
               username: default_user_MMPMaInRnalJfVI0CLW
               password: 59851ZcAEabItp31aS8fbYiOcu_eyAKm
+          wavefront:
+            application:
+              name: streaming-example
+          management:
+            metrics:
+              export:
+                wavefront:
+                  api-token: {{ requiredEnv "WAVEFRONT_TOKEN" }}
+                  uri: https://longboard.wavefront.com
 
   - name: streaming-consumer
     chart: helm/streaming-service
@@ -20,10 +31,21 @@ releases:
           tag: 0.0.6
         appConfig:
           spring:
+            application:
+              name: streaming-consumer
             rabbitmq:
               host: cluster1
               username: default_user_MMPMaInRnalJfVI0CLW
               password: 59851ZcAEabItp31aS8fbYiOcu_eyAKm
+          wavefront:
+            application:
+              name: streaming-example
+          management:
+            metrics:
+              export:
+                wavefront:
+                  api-token: {{ requiredEnv "WAVEFRONT_TOKEN" }}
+                  uri: https://longboard.wavefront.com
 
   - name: streaming-processor1
     chart: helm/streaming-service
@@ -33,6 +55,8 @@ releases:
           tag: 0.0.6
         appConfig:
           spring:
+            application:
+              name: streaming-processor1
             rabbitmq:
               host: cluster1
               username: default_user_MMPMaInRnalJfVI0CLW
@@ -41,10 +65,24 @@ releases:
               stream:
                 bindings:
                   peopleProcessor1-in-0:
+                    group: processor1
                     destination: peopleProducer-out-0
                   peopleProcessor1-out-0:
                     destination: peopleConsumer-in-0
-
+          wavefront:
+            application:
+              name: streaming-example
+          management:
+            metrics:
+              export:
+                wavefront:
+                  api-token: {{ requiredEnv "WAVEFRONT_TOKEN" }}
+                  uri: https://longboard.wavefront.com
+        scaling:
+          rabbitMQ:
+            enabled: true
+            apiUrl: "http://default_user_MMPMaInRnalJfVI0CLW:59851ZcAEabItp31aS8fbYiOcu_eyAKm@cluster1.default:15672/"
+            queueName: "peopleProducer-out-0.processor1"
 
   - name: streaming-processor2
     chart: helm/streaming-service
@@ -54,6 +92,8 @@ releases:
           tag: 0.0.6
         appConfig:
           spring:
+            application:
+              name: streaming-processor2
             rabbitmq:
               host: cluster1
               username: default_user_MMPMaInRnalJfVI0CLW
@@ -62,6 +102,21 @@ releases:
               stream:
                 bindings:
                   peopleProcessor2-in-0:
+                    group: processor2
                     destination: peopleProducer-out-0
                   peopleProcessor2-out-0:
                     destination: peopleConsumer-in-0
+          wavefront:
+            application:
+              name: streaming-example
+          management:
+            metrics:
+              export:
+                wavefront:
+                  api-token: {{ requiredEnv "WAVEFRONT_TOKEN" }}
+                  uri: https://longboard.wavefront.com
+        scaling:
+          rabbitMQ:
+            enabled: true
+            apiUrl: "http://default_user_MMPMaInRnalJfVI0CLW:59851ZcAEabItp31aS8fbYiOcu_eyAKm@cluster1.default:15672/"
+            queueName: "peopleProducer-out-0.processor2"

@@ -1,4 +1,4 @@
-package app;
+package lib;
 
 import lombok.Data;
 import org.springframework.boot.SpringApplication;

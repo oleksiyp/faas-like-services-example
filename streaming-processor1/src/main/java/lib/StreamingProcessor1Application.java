@@ -1,4 +1,4 @@
-package app;
+package lib;
 
 import lombok.Builder;
 import lombok.Value;
@@ -6,7 +6,6 @@ import lombok.extern.jackson.Jacksonized;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 
 import java.util.function.Function;
 

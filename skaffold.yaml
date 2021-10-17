@@ -62,7 +62,6 @@ deploy:
       before:
         - host:
             command:
-              - env
               - sh
               - -c
               - |-

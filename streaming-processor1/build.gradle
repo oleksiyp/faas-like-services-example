@@ -1,6 +1,5 @@
 plugins {
 	id 'org.springframework.boot' version '2.5.5'
-	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
     id "io.freefair.lombok" version "6.2.0"
 	id 'com.google.cloud.tools.jib' version '3.1.4'
@@ -13,25 +12,10 @@ repositories {
 	mavenCentral()
 }
 
-ext {
-	set('springCloudVersion', "2020.0.4")
-}
-
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-amqp'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.cloud:spring-cloud-stream'
-	implementation 'org.springframework.cloud:spring-cloud-stream-binder-rabbit'
-	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation project(":streaming-lib")
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.amqp:spring-rabbit-test'
-}
-
-dependencyManagement {
-	imports {
-		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-	}
+	testImplementation 'org.springframework.boot:spring-boot-starter-test:2.5.5'
+	testImplementation 'org.springframework.amqp:spring-rabbit-test:2.3.9'
 }
 
 test {

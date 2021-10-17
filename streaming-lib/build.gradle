@@ -2,7 +2,7 @@ plugins {
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id "io.freefair.lombok" version "6.2.0"
     id 'org.springframework.boot' version '2.5.5'
-    id 'java'
+    id 'java-library'
 }
 
 version '0.0.6'
@@ -17,18 +17,19 @@ ext {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-amqp'
-    implementation 'org.springframework.cloud:spring-cloud-stream'
-    implementation 'org.springframework.cloud:spring-cloud-stream-binder-rabbit'
-    implementation 'org.springframework:spring-context'
-    implementation 'io.fabric8:kubernetes-client:5.9.0'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+    api 'org.springframework.boot:spring-boot-starter-webflux:2.5.5'
+    api 'org.springframework.cloud:spring-cloud-stream:3.1.4'
+    api 'org.springframework.cloud:spring-cloud-function-core:3.1.4'
+    api 'org.springframework.cloud:spring-cloud-stream-binder-rabbit:3.1.4'
+    api 'org.springframework.boot:spring-boot-starter-actuator:2.5.5'
+    api 'org.springframework.cloud:spring-cloud-starter-sleuth:3.0.4'
+    api 'com.wavefront:wavefront-spring-boot-starter:2.2.0'
 }
 
 dependencyManagement {
     imports {
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+        mavenBom "com.wavefront:wavefront-spring-boot-bom:2.1.1"
     }
 }
 

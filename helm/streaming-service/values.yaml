@@ -12,6 +12,11 @@ image:
   # Overrides the image tag whose default is the chart appVersion.
   tag: 0.0.1-SNAPSHOT
 
+scaling:
+  rabbitMQ:
+    enabled: false
+    queueLengthThreshold: 20
+
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""

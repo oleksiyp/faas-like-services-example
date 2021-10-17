@@ -1,0 +1,41 @@
+{{ if .Values.scaling.rabbitMQ.enabled }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "streaming-service.fullname" . }}-rmq-auth
+data:
+  host: {{ .Values.scaling.rabbitMQ.apiUrl | b64enc }}
+---
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata:
+  name: {{ include "streaming-service.fullname" . }}-auth
+spec:
+  secretTargetRef:
+    - parameter: host
+      name: {{ include "streaming-service.fullname" . }}-rmq-auth
+      key: host
+---
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: {{ include "streaming-service.fullname" . }}
+spec:
+  pollingInterval: 1
+  cooldownPeriod: 60
+  minReplicaCount: 0
+  maxReplicaCount: 30
+  scaleTargetRef:
+    name: {{ include "streaming-service.fullname" . }}
+  triggers:
+    - type: rabbitmq
+      metadata:
+        protocol: http
+        queueName: {{ .Values.scaling.rabbitMQ.queueName }}
+        mode: QueueLength
+        value: {{ .Values.scaling.rabbitMQ.queueLengthThreshold | quote }}
+      authenticationRef:
+        name: {{ include "streaming-service.fullname" . }}-auth
+
+{{ end }}
+
