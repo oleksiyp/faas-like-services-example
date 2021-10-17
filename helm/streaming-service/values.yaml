@@ -15,7 +15,12 @@ image:
 scaling:
   rabbitMQ:
     enabled: false
+    queueName: ""
     queueLengthThreshold: 20
+    pollingInterval: 1
+    cooldownPeriod: 60
+    minReplicaCount: 0
+    maxReplicaCount: 30
 
 imagePullSecrets: []
 nameOverride: ""

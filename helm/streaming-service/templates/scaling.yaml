@@ -21,10 +21,10 @@ kind: ScaledObject
 metadata:
   name: {{ include "streaming-service.fullname" . }}
 spec:
-  pollingInterval: 1
-  cooldownPeriod: 60
-  minReplicaCount: 0
-  maxReplicaCount: 30
+  pollingInterval: {{ .Values.scaling.rabbitMQ.pollingInterval }}
+  cooldownPeriod: {{ .Values.scaling.rabbitMQ.cooldownPeriod }}
+  minReplicaCount: {{ .Values.scaling.rabbitMQ.minReplicaCount }}
+  maxReplicaCount: {{ .Values.scaling.rabbitMQ.maxReplicaCount }}
   scaleTargetRef:
     name: {{ include "streaming-service.fullname" . }}
   triggers:
