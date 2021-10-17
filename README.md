@@ -7,7 +7,7 @@
 ## How to run?
 
 Install following tools from corresponding websites:
- * 
+
  * docker
  * helm
  * kubectl
