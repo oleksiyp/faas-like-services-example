@@ -19,9 +19,15 @@ public class StreamingProducerApp {
 	@Bean
 	public Supplier<Person> peopleProducer() {
 		AtomicLong count = new AtomicLong();
-		return () -> Person.builder()
-				.name("name" + count.incrementAndGet())
-				.build();
+
+		return () ->  {
+			long cnt = System.currentTimeMillis();
+			System.out.println("" + cnt);
+			return Person.builder()
+					.name("name" + count.incrementAndGet())
+					.start(cnt)
+					.build();
+		};
 	}
 
 	@Value
@@ -29,5 +35,6 @@ public class StreamingProducerApp {
 	@Jacksonized
 	public static class Person {
 		String name;
+		long start;
 	}
 }

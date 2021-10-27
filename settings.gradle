@@ -3,3 +3,5 @@ include("streaming-producer")
 include("streaming-consumer")
 include("streaming-processor1")
 include("streaming-processor2")
+include("rabbitmq-queue-scaler")
+

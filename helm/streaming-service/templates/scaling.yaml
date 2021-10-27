@@ -16,26 +16,16 @@ spec:
       name: {{ include "streaming-service.fullname" . }}-rmq-auth
       key: host
 ---
-apiVersion: keda.sh/v1alpha1
+apiVersion: oleksiyp.github.io/v1
 kind: ScaledObject
 metadata:
   name: {{ include "streaming-service.fullname" . }}
 spec:
-  pollingInterval: {{ .Values.scaling.rabbitMQ.pollingInterval }}
-  cooldownPeriod: {{ .Values.scaling.rabbitMQ.cooldownPeriod }}
+  queueName: {{ .Values.scaling.rabbitMQ.queueName }}
   minReplicaCount: {{ .Values.scaling.rabbitMQ.minReplicaCount }}
   maxReplicaCount: {{ .Values.scaling.rabbitMQ.maxReplicaCount }}
-  scaleTargetRef:
-    name: {{ include "streaming-service.fullname" . }}
-  triggers:
-    - type: rabbitmq
-      metadata:
-        protocol: http
-        queueName: {{ .Values.scaling.rabbitMQ.queueName }}
-        mode: QueueLength
-        value: {{ .Values.scaling.rabbitMQ.queueLengthThreshold | quote }}
-      authenticationRef:
-        name: {{ include "streaming-service.fullname" . }}-auth
+  messageThreshold: {{ .Values.scaling.rabbitMQ.queueLengthThreshold }}
+  rateThreshold: {{ .Values.scaling.rabbitMQ.messageRateThreshold }}
 
 {{ end }}
 

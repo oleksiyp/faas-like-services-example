@@ -20,7 +20,7 @@ public class StreamingProcessor1Application {
         return person -> {
             System.out.println(Thread.currentThread().getName());
             try {
-                Thread.sleep(2000);
+                Thread.sleep(200);
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
             }
@@ -35,5 +35,6 @@ public class StreamingProcessor1Application {
     @Jacksonized
     public static class Person {
         String name;
+        long start;
     }
 }

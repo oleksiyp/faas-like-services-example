@@ -15,11 +15,15 @@ public class StreamingConsumerApplication {
 
 	@Bean
 	public Consumer<Person> peopleConsumer() {
-		return person -> System.out.println("Received: " + person);
+		return person -> {
+			long end = System.currentTimeMillis();
+			System.out.println(end - person.start);
+		};
 	}
 
 	@Data
 	public static class Person {
 		String name;
+		long start;
 	}
 }

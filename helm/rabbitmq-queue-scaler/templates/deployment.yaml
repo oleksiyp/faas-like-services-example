@@ -1,25 +1,26 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "streaming-service.fullname" . }}
+  name: {{ include "rabbitmq-queue-scaler.fullname" . }}
   labels:
-    {{- include "streaming-service.labels" . | nindent 4 }}
+    {{- include "rabbitmq-queue-scaler.labels" . | nindent 4 }}
 spec:
+  replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      {{- include "streaming-service.selectorLabels" . | nindent 6 }}
+      {{- include "rabbitmq-queue-scaler.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       annotations:
         checksum/config: {{ .Values.appConfig | toJson | sha256sum }}
       labels:
-        {{- include "streaming-service.selectorLabels" . | nindent 8 }}
+        {{- include "rabbitmq-queue-scaler.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "streaming-service.serviceAccountName" . }}
+      serviceAccountName: {{ include "rabbitmq-queue-scaler.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
@@ -59,7 +60,7 @@ spec:
       volumes:
         - name: config
           configMap:
-            name: {{ include "streaming-service.fullname" . }}
+            name: {{ include "rabbitmq-queue-scaler.fullname" . }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

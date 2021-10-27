@@ -5,11 +5,17 @@ plugins {
 	id 'com.google.cloud.tools.jib' version '3.1.4'
 }
 
-group = 'com.example'
+group = 'io.github.oleksiyp'
 sourceCompatibility = '11'
 
 repositories {
 	mavenCentral()
+}
+
+jib {
+	from {
+		image = "adoptopenjdk:16-jre-hotspot"
+	}
 }
 
 dependencies {

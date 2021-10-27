@@ -1,6 +1,4 @@
 repositories:
-  - name: kedacore
-    url: https://kedacore.github.io/charts
   - name: wavefront
     url: https://wavefronthq.github.io/helm/
   - name: bitnami
@@ -20,9 +18,6 @@ releases:
             additionalPlugins:
               - rabbitmq_top
 
-  - name: keda
-    chart: kedacore/keda
-
   - name: wavefront
     chart: wavefront/wavefront
     installed: {{ gt (env "WAVEFRONT_TOKEN" | default "" | len) 0 }}
@@ -35,7 +30,7 @@ releases:
   - name: streaming-producer
     chart: helm/streaming-service
     needs:
-      - keda
+      - rabbitmq-queue-scaler
       - rabbitmq-cluster
       - wavefront
     values:
@@ -50,6 +45,10 @@ releases:
               name: streaming-producer
             rabbitmq:
               host: rabbitmq-cluster
+            cloud:
+              stream:
+                poller:
+                  fixed-delay: 40000
           wavefront:
             application:
               name: streaming-example
@@ -63,7 +62,7 @@ releases:
   - name: streaming-consumer
     chart: helm/streaming-service
     needs:
-      - keda
+      - rabbitmq-queue-scaler
       - rabbitmq-cluster
       - wavefront
     values:
@@ -90,7 +89,7 @@ releases:
   - name: streaming-processor1
     chart: helm/streaming-service
     needs:
-      - keda
+      - rabbitmq-queue-scaler
       - rabbitmq-cluster
       - wavefront
     values:
@@ -127,42 +126,56 @@ releases:
             enabled: true
             queueName: "peopleProducer-out-0.processor1"
 
-  - name: streaming-processor2
-    chart: helm/streaming-service
+#  - name: streaming-processor2
+#    chart: helm/streaming-service
+#    needs:
+#      - rabbitmq-queue-scaler
+#      - rabbitmq-cluster
+#      - wavefront
+#    values:
+#      - values-rmq-secret.yaml.gotmpl
+#      - values-scaling.yaml.gotmpl
+#      - image:
+#          repository: streaming-processor2
+#          tag: 1.0.0
+#        appConfig:
+#          spring:
+#            application:
+#              name: streaming-processor2
+#            rabbitmq:
+#              host: rabbitmq-cluster
+#            cloud:
+#              stream:
+#                bindings:
+#                  peopleProcessor2-in-0:
+#                    group: processor2
+#                    destination: peopleProducer-out-0
+#                  peopleProcessor2-out-0:
+#                    destination: peopleConsumer-in-0
+#          wavefront:
+#            application:
+#              name: streaming-example
+#          management:
+#            metrics:
+#              export:
+#                wavefront:
+#                  api-token: {{ env "WAVEFRONT_TOKEN" | default "not-set" }}
+#                  uri: https://longboard.wavefront.com
+#        scaling:
+#          rabbitMQ:
+#            enabled: true
+#            queueName: "peopleProducer-out-0.processor2"
+
+  - name: rabbitmq-queue-scaler
+    chart: helm/rabbitmq-queue-scaler
     needs:
-      - keda
       - rabbitmq-cluster
-      - wavefront
     values:
-      - values-rmq-secret.yaml.gotmpl
-      - values-scaling.yaml.gotmpl
+      - values-rmq-secret-scaler.yaml.gotmpl
       - image:
-          repository: streaming-processor2
+          repository: rabbitmq-queue-scaler
           tag: 1.0.0
         appConfig:
           spring:
             application:
-              name: streaming-processor2
-            rabbitmq:
-              host: rabbitmq-cluster
-            cloud:
-              stream:
-                bindings:
-                  peopleProcessor2-in-0:
-                    group: processor2
-                    destination: peopleProducer-out-0
-                  peopleProcessor2-out-0:
-                    destination: peopleConsumer-in-0
-          wavefront:
-            application:
-              name: streaming-example
-          management:
-            metrics:
-              export:
-                wavefront:
-                  api-token: {{ env "WAVEFRONT_TOKEN" | default "not-set" }}
-                  uri: https://longboard.wavefront.com
-        scaling:
-          rabbitMQ:
-            enabled: true
-            queueName: "peopleProducer-out-0.processor2"
+              name: rabbitmq-queue-scaler

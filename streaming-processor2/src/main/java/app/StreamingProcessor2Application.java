@@ -19,7 +19,7 @@ public class StreamingProcessor2Application {
     public Function<Person, Person> peopleProcessor2() {
         return person -> {
             try {
-                Thread.sleep(3000);
+                Thread.sleep(300);
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
             }
@@ -34,5 +34,6 @@ public class StreamingProcessor2Application {
     @Jacksonized
     public static class Person {
         String name;
+        long start;
     }
 }

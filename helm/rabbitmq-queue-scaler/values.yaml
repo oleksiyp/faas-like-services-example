@@ -1,4 +1,4 @@
-# Default values for streaming-service.
+# Default values for rabbitmq-queue-scaler.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
@@ -7,7 +7,7 @@ replicaCount: 1
 appConfig: {}
 
 image:
-  repository: streaming-service
+  repository: rabbitmq-queue-scaler
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: 1.0.0
@@ -17,7 +17,6 @@ scaling:
     enabled: false
     queueName: ""
     queueLengthThreshold: 20
-    messageRateThreshold: 0
     pollingInterval: 1
     cooldownPeriod: 5
     minReplicaCount: 0

@@ -7,6 +7,10 @@ build:
     sha256: { }
 
   artifacts:
+    - image: rabbitmq-queue-scaler
+      context: rabbitmq-queue-scaler
+      jib:
+        project: rabbitmq-queue-scaler
     - image: streaming-producer
       context: streaming-producer
       jib:
@@ -19,13 +23,21 @@ build:
       context: streaming-processor1
       jib:
         project: streaming-processor1
-    - image: streaming-processor2
-      context: streaming-processor2
-      jib:
-        project: streaming-processor2
+#    - image: streaming-processor2
+#      context: streaming-processor2
+#      jib:
+#        project: streaming-processor2
 deploy:
   helm:
     releases:
+      - name: rabbitmq-queue-scaler
+        chartPath: helm/rabbitmq-queue-scaler
+        artifactOverrides:
+          image: rabbitmq-queue-scaler
+        imageStrategy:
+          helm: {}
+        valuesFiles:
+          - .skaffold/rabbitmq-queue-scaler.yaml
       - name: streaming-producer
         chartPath: helm/streaming-service
         artifactOverrides:
@@ -50,14 +62,14 @@ deploy:
           helm: {}
         valuesFiles:
           - .skaffold/streaming-processor1.yaml
-      - name: streaming-processor2
-        chartPath: helm/streaming-service
-        artifactOverrides:
-          image: streaming-processor2
-        imageStrategy:
-          helm: {}
-        valuesFiles:
-          - .skaffold/streaming-processor2.yaml
+#      - name: streaming-processor2
+#        chartPath: helm/streaming-service
+#        artifactOverrides:
+#          image: streaming-processor2
+#        imageStrategy:
+#          helm: {}
+#        valuesFiles:
+#          - .skaffold/streaming-processor2.yaml
     hooks:
       before:
         - host:
@@ -68,7 +80,8 @@ deploy:
                 helmfile --selector name=streaming-producer write-values --skip-deps --output-file-template=.skaffold/streaming-producer.yaml
                 helmfile --selector name=streaming-consumer write-values --skip-deps --output-file-template=.skaffold/streaming-consumer.yaml
                 helmfile --selector name=streaming-processor1 write-values --skip-deps --output-file-template=.skaffold/streaming-processor1.yaml
-                helmfile --selector name=streaming-processor2 write-values --skip-deps --output-file-template=.skaffold/streaming-processor2.yaml
+                helmfile --selector name=rabbitmq-queue-scaler write-values --skip-deps --output-file-template=.skaffold/rabbitmq-queue-scaler.yaml
+#                helmfile --selector name=streaming-processor2 write-values --skip-deps --output-file-template=.skaffold/streaming-processor2.yaml
       after:
         - host:
             command:
